@@ -1,0 +1,12 @@
+# Backups and temp files
+* - Copy*.html
+*.bak
+*.tmp
+temp_check.js
+temp_check.html
+.DS_Store
+Thumbs.db
+
+# OS metadata
+.idea/
+.vscode/
