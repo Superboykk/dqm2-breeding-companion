@@ -10,15 +10,15 @@
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600&display=swap');
 
   :root {
-    --gold: #f5c842;
-    --gold-dim: #c9a02a;
-    --bg0: #0a0a12;
-    --bg1: #111120;
-    --bg2: #1a1a2e;
-    --bg3: #22223a;
-    --border: #2e2e4a;
-    --text: #e2e2f0;
-    --text-dim: #8888aa;
+    --gold: #e0f8d0;
+    --gold-dim: #88c070;
+    --bg0: #081820;
+    --bg1: #081820;
+    --bg2: #346856;
+    --bg3: #081820;
+    --border: #88c070;
+    --text: #ffffff;
+    --text-dim: #88c070;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -44,8 +44,8 @@
 
   /* ── Header ── */
   #header {
-    background: linear-gradient(135deg, #0f0f20 0%, #1a1026 100%);
-    border-bottom: 1px solid var(--gold-dim);
+    background: var(--bg0);
+    border-bottom: 2px solid var(--border);
     padding: 12px 16px 10px;
     display: flex;
     align-items: center;
@@ -120,8 +120,9 @@
     margin-bottom: 10px;
   }
   .card-highlight {
-    background: linear-gradient(135deg, #1a1a2e 0%, #1e1530 100%);
-    border-color: var(--gold-dim);
+    background: linear-gradient(135deg, var(--bg2) 0%, var(--bg0) 100%);
+    border-color: var(--gold);
+    border-width: 2px;
   }
 
   /* ── Autocomplete ── */
@@ -161,7 +162,7 @@
     gap: 8px;
     transition: background 0.1s;
   }
-  .ac-item:hover, .ac-item.focused { background: var(--border); }
+  .ac-item:hover, .ac-item.focused { background: var(--border); color: var(--bg0); }
   .ac-item:not(:last-child) { border-bottom: 1px solid var(--border); }
 
   /* ── Family Badges ── */
@@ -194,8 +195,8 @@
     align-items: flex-start;
     gap: 12px;
     padding: 14px;
-    background: linear-gradient(135deg, var(--bg2), #1c1635);
-    border: 1px solid var(--gold-dim);
+    background: linear-gradient(135deg, var(--bg2), var(--bg0));
+    border: 1px solid var(--border);
     border-radius: 10px;
     margin-top: 4px;
   }
@@ -337,12 +338,12 @@
   .btn-primary {
     width: 100%;
     padding: 11px;
-    background: linear-gradient(135deg, #7c3aed, #5b21b6);
-    border: 1px solid #7c3aed;
+    background: linear-gradient(135deg, var(--gold-dim), var(--bg2));
+    border: 1px solid var(--gold);
     border-radius: 8px;
-    color: #fff;
+    color: var(--bg0);
     font-size: 0.88rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: opacity 0.15s;
     font-family: 'Inter', sans-serif;
@@ -394,10 +395,10 @@
   .res-cell { background: var(--bg3); border-radius: 4px; padding: 4px 6px; }
   .res-cell-label { font-size: 0.58rem; color: var(--text-dim); }
   .res-cell-val { font-size: 0.72rem; font-weight: 600; }
-  .res-0 { color: #f87171; }
-  .res-1 { color: #fbbf24; }
-  .res-2 { color: #34d399; }
-  .res-3 { color: #60a5fa; }
+  .res-0 { color: var(--gold-dim); opacity: 0.55; }
+  .res-1 { color: var(--gold-dim); }
+  .res-2 { color: var(--gold); }
+  .res-3 { color: #ffffff; }
 
   /* ── My Monsters Inventory ── */
   .gender-btn {
@@ -412,14 +413,14 @@
     color: var(--text-dim);
   }
   .gender-btn.active-male {
-    background: #1e3a8a;
-    border-color: #3b82f6;
-    color: #93c5fd;
+    background: var(--bg0);
+    border-color: var(--gold);
+    color: var(--gold);
   }
   .gender-btn.active-female {
-    background: #881337;
-    border-color: #f43f5e;
-    color: #fda4af;
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg0);
   }
   .monster-inv-card {
     display: flex;
@@ -431,8 +432,8 @@
     border-radius: 8px;
     margin-bottom: 6px;
   }
-  .badge-male { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
-  .badge-female { background: #881337; color: #fda4af; border: 1px solid #f43f5e; }
+  .badge-male { background: var(--bg0); color: var(--gold-dim); border: 1px solid var(--border); }
+  .badge-female { background: var(--gold); color: var(--bg0); border: 1px solid var(--gold); }
 
   /* ── Breeding Tree Chart ── */
   .tree-container {
@@ -2310,8 +2311,8 @@ function runBreedCheck() {
 function renderStatMiniBar(stats) {
   if (!stats) return '';
   const bars = [
-    ['HP',stats.hp,'#f87171'],['MP',stats.mp,'#818cf8'],['ATK',stats.atk,'#fb923c'],
-    ['DEF',stats.def,'#34d399'],['AGL',stats.agl,'#facc15'],['INT',stats.int,'#60a5fa']
+    ['HP',stats.hp,'var(--gold-dim)'],['MP',stats.mp,'var(--gold-dim)'],['ATK',stats.atk,'var(--gold-dim)'],
+    ['DEF',stats.def,'var(--gold-dim)'],['AGL',stats.agl,'var(--gold-dim)'],['INT',stats.int,'var(--gold-dim)']
   ];
   return `<div style="margin-top:10px;">
     <div style="font-size:0.65rem;color:var(--text-dim);margin-bottom:6px;">BASE STATS (Growth Rate)</div>
@@ -2570,8 +2571,8 @@ function openMonsterModal(name) {
   const recipes = findRecipes(name);
 
   const bars = [
-    ['HP',stats?.hp??0,'#f87171'],['MP',stats?.mp??0,'#818cf8'],['ATK',stats?.atk??0,'#fb923c'],
-    ['DEF',stats?.def??0,'#34d399'],['AGL',stats?.agl??0,'#facc15'],['INT',stats?.int??0,'#60a5fa']
+    ['HP',stats?.hp??0,'var(--gold-dim)'],['MP',stats?.mp??0,'var(--gold-dim)'],['ATK',stats?.atk??0,'var(--gold-dim)'],
+    ['DEF',stats?.def??0,'var(--gold-dim)'],['AGL',stats?.agl??0,'var(--gold-dim)'],['INT',stats?.int??0,'var(--gold-dim)']
   ];
 
   let recipeHtml = '';
