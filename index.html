@@ -532,6 +532,30 @@
     background: var(--border);
     border-radius: 4px;
   }
+
+  /* ── Skill Detail Modal ── */
+  #skill-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 250; /* Higher than monster modal */
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  #skill-modal-overlay.open { display: flex; }
+  #skill-modal-panel {
+    background: var(--bg1);
+    border-top: 1px solid var(--gold-dim);
+    border-radius: 16px 16px 0 0;
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 20px 16px 30px;
+    animation: slideUp 0.25s ease;
+  }
+
 </style>
 </head>
 <body>
@@ -686,6 +710,13 @@
   <div id="modal-panel" style="position:relative">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div id="modal-content"></div>
+  </div>
+</div>
+<!-- Skill Detail Modal -->
+<div id="skill-modal-overlay" onclick="closeSkillModal(event)">
+  <div id="skill-modal-panel" style="position:relative">
+    <button class="modal-close" onclick="closeSkillModal()">✕</button>
+    <div id="skill-modal-content"></div>
   </div>
 </div>
 
@@ -2043,6 +2074,4058 @@ const getMonsterImg = (name, sizeClass = "w-6 h-6") => {
   return `<img src="monster%20image/${filename}" class="${sizeClass} inline-block object-contain" style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;" onerror="this.outerHTML='<span class=\\'inline-block text-center\\'>${emoji}</span>'" alt="${name}">`;
 };
 
+const SKILLS_DB = {
+  "ahhh": {
+    "name": "AHHH",
+    "mp": 1,
+    "desc": "Soft plushy and very pleasant.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 0,
+      "atk": 60,
+      "def": 0,
+      "agl": 60,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MimeSlime",
+      "Lipsy"
+    ]
+  },
+  "antidote": {
+    "name": "ANTIDOTE",
+    "mp": 2,
+    "desc": "Cures one monster of poison.",
+    "reqs": {
+      "lv": 5,
+      "hp": 0,
+      "mp": 21,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 47
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Dracky",
+      "FloraMan",
+      "Pixy",
+      "WhaleMage"
+    ]
+  },
+  "aquacut": {
+    "name": "AQUACUT",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the water family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 68,
+      "mp": 0,
+      "atk": 72,
+      "def": 0,
+      "agl": 62,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "LizardMan",
+      "Garudian",
+      "EvilArmor",
+      "CaptDead",
+      "DeadNoble"
+    ]
+  },
+  "aquawall": {
+    "name": "AQUAWALL",
+    "mp": 5,
+    "desc": "Creates a barrier that blocks an attack.",
+    "reqs": {
+      "lv": 20,
+      "hp": 100,
+      "mp": 94,
+      "atk": 0,
+      "def": 84,
+      "agl": 0,
+      "int": 202
+    },
+    "upgrades": [],
+    "combined": [
+      "Bounce",
+      "Tidalwave"
+    ],
+    "monsters": [
+      "AquaHawk",
+      "RayGigas",
+      "RogueWave"
+    ]
+  },
+  "bang": {
+    "name": "BANG",
+    "mp": 5,
+    "desc": "Small explosions strike enemies [all}",
+    "reqs": {
+      "lv": 4,
+      "hp": 0,
+      "mp": 13,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 47
+    },
+    "upgrades": [
+      "Boom",
+      "Explodet"
+    ],
+    "combined": [],
+    "monsters": [
+      "Metabble",
+      "Coatol",
+      "Gorago",
+      "ArcDemon",
+      "GoatHorn",
+      "Akubar",
+      "Titanis",
+      "BoneSlave",
+      "Balzak",
+      "Hargon",
+      "Baramos",
+      "Mirudraas",
+      "Orgodemir",
+      "Darck"
+    ]
+  },
+  "barrier": {
+    "name": "BARRIER",
+    "mp": 3,
+    "desc": "Reduces damage from breath attacks [all}",
+    "reqs": {
+      "lv": 18,
+      "hp": 0,
+      "mp": 76,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 126
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "KingSlime",
+      "MistyWing",
+      "AmberWeed",
+      "WeedBug",
+      "CloudKing",
+      "Aquarella",
+      "Genosidoh"
+    ]
+  },
+  "bazoocall": {
+    "name": "BAZOOCALL",
+    "mp": 20,
+    "desc": "Summons Bazoo to battle.",
+    "reqs": {
+      "lv": 35,
+      "hp": 0,
+      "mp": 160,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 550
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "beastcut": {
+    "name": "BEASTCUT",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the beast family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 62,
+      "mp": 0,
+      "atk": 68,
+      "def": 0,
+      "agl": 62,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "SlimeNite",
+      "Florajay",
+      "GiantWorm",
+      "MadKnight",
+      "CancerMan"
+    ]
+  },
+  "beat": {
+    "name": "BEAT",
+    "mp": 4,
+    "desc": "Instantly slays an enemy.",
+    "reqs": {
+      "lv": 16,
+      "hp": 0,
+      "mp": 58,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 137
+    },
+    "upgrades": [
+      "Defeat"
+    ],
+    "combined": [],
+    "monsters": [
+      "Metaly",
+      "Blizzardy",
+      "Devipine",
+      "Gophecada",
+      "Skulpent",
+      "Mudron",
+      "PomPomBom",
+      "Niterich",
+      "EvilPot",
+      "Mimic",
+      "DarkMate"
+    ]
+  },
+  "bedragon": {
+    "name": "BEDRAGON",
+    "mp": 9,
+    "desc": "Transforms the user into a ferocious dragon.",
+    "reqs": {
+      "lv": 23,
+      "hp": 0,
+      "mp": 72,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 162
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "DrakSlime",
+      "Crestpent",
+      "DracoLord"
+    ]
+  },
+  "berserker": {
+    "name": "BERSERKER",
+    "mp": 1,
+    "desc": "A powerful attack that leaves the user vulnerable.",
+    "reqs": {
+      "lv": 14,
+      "hp": 98,
+      "mp": 0,
+      "atk": 84,
+      "def": 84,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Gasgon",
+      "Spikerous",
+      "Orligon",
+      "Almiraj",
+      "Trumpeter",
+      "Titanis",
+      "Aquadon"
+    ]
+  },
+  "biattack": {
+    "name": "BIATTACK",
+    "mp": 3,
+    "desc": "A physical attack that strikes twice in succession.",
+    "reqs": {
+      "lv": 19,
+      "hp": 98,
+      "mp": 0,
+      "atk": 88,
+      "def": 0,
+      "agl": 112,
+      "int": 0
+    },
+    "upgrades": [
+      "QuadHits"
+    ],
+    "combined": [],
+    "monsters": [
+      "Vampirus",
+      "Orochi",
+      "Grizzly",
+      "KingLeo",
+      "Rosevine",
+      "Skularach",
+      "Jamirus",
+      "BoneSlave",
+      "Skeletor",
+      "Roboster",
+      "Clawster",
+      "HoodSquid",
+      "Octogon",
+      "Pizzaro",
+      "Esterk"
+    ]
+  },
+  "bigbang": {
+    "name": "BIGBANG",
+    "mp": 30,
+    "desc": "Creates an enormous explosion [all}",
+    "reqs": {
+      "lv": 36,
+      "hp": 196,
+      "mp": 196,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 612
+    },
+    "upgrades": [],
+    "combined": [
+      "Explodet",
+      "WhiteFire",
+      "WhiteAir"
+    ],
+    "monsters": [
+      "GoldSlime",
+      "Divinegon",
+      "GoldGolem",
+      "Zoma",
+      "PsychoPiz",
+      "DeathMore1",
+      "DeathMore3",
+      "Kagebou"
+    ]
+  },
+  "bigtrip": {
+    "name": "BIGTRIP",
+    "mp": 3,
+    "desc": "Sweeps the legs out from under all enemies.",
+    "reqs": {
+      "lv": 12,
+      "hp": 66,
+      "mp": 0,
+      "atk": 63,
+      "def": 0,
+      "agl": 77,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "birdblow": {
+    "name": "BIRDBLOW",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the bird family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 62,
+      "mp": 0,
+      "atk": 68,
+      "def": 0,
+      "agl": 72,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MadGopher",
+      "Orc",
+      "Durran",
+      "WindMerge",
+      "Skeletor"
+    ]
+  },
+  "bladed": {
+    "name": "BLADED",
+    "mp": 3,
+    "desc": "Protects the user and enables retaliation.",
+    "reqs": {
+      "lv": 14,
+      "hp": 98,
+      "mp": 0,
+      "atk": 84,
+      "def": 84,
+      "agl": 84,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [
+      "TwinSlash",
+      "StrongD"
+    ],
+    "monsters": [
+      "SlimeBorg",
+      "Swordgon",
+      "Rosevine",
+      "Bubblemon",
+      "Niterich",
+      "SeaHorse"
+    ]
+  },
+  "blaze": {
+    "name": "BLAZE",
+    "mp": 2,
+    "desc": "Attacks an enemy with a fireball.",
+    "reqs": {
+      "lv": 1,
+      "hp": 0,
+      "mp": 7,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 36
+    },
+    "upgrades": [
+      "BlazeMore",
+      "BlazeMost"
+    ],
+    "combined": [],
+    "monsters": [
+      "BoxSlime",
+      "Metaly",
+      "ArrowDog",
+      "CatMage",
+      "FireWeed",
+      "Demonite",
+      "1EyeClown",
+      "GateGuard",
+      "EvilWell",
+      "Jamirus",
+      "FoxFire",
+      "Servant",
+      "MadCandle",
+      "LavaMan",
+      "Mimic",
+      "Mirudraas"
+    ]
+  },
+  "blazeair": {
+    "name": "BLAZEAIR",
+    "mp": 4,
+    "desc": "Inflicts damage with a blast of fire [all}",
+    "reqs": {
+      "lv": 10,
+      "hp": 70,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [
+      "Scorching",
+      "WhiteFire"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "blazemore": {
+    "name": "BLAZEMORE",
+    "mp": 4,
+    "desc": "Attacks an enemy with a large fireball.",
+    "reqs": {
+      "lv": 13,
+      "hp": 0,
+      "mp": 46,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 116
+    },
+    "upgrades": [
+      "BlazeMost"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "blazemost": {
+    "name": "BLAZEMOST",
+    "mp": 10,
+    "desc": "A towering pillar of fire roasts an enemy.",
+    "reqs": {
+      "lv": 28,
+      "hp": 0,
+      "mp": 112,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 263
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "blizzard": {
+    "name": "BLIZZARD",
+    "mp": 12,
+    "desc": "A wicked blizzard howls through enemies [all}",
+    "reqs": {
+      "lv": 25,
+      "hp": 0,
+      "mp": 88,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 198
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "bolt": {
+    "name": "BOLT",
+    "mp": 5,
+    "desc": "Lightning strikes enemies [all}",
+    "reqs": {
+      "lv": 6,
+      "hp": 0,
+      "mp": 20,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 63
+    },
+    "upgrades": [
+      "Zap",
+      "Thordain"
+    ],
+    "combined": [],
+    "monsters": [
+      "MetalKing",
+      "FooHero",
+      "WhiteKing",
+      "Balzak",
+      "Angleron",
+      "Poseidon",
+      "LordDraco",
+      "Mirudraas",
+      "Darkdrium"
+    ]
+  },
+  "boltslash": {
+    "name": "BOLTSLASH",
+    "mp": 3,
+    "desc": "A sword attack made stronger by lightning.",
+    "reqs": {
+      "lv": 11,
+      "hp": 77,
+      "mp": 34,
+      "atk": 66,
+      "def": 0,
+      "agl": 0,
+      "int": 76
+    },
+    "upgrades": [],
+    "combined": [
+      "Lightning",
+      "ChargeUp"
+    ],
+    "monsters": [
+      "Coatol",
+      "LandOwl",
+      "ZapBird",
+      "HornBeet",
+      "ArcDemon",
+      "EvilArmor",
+      "RotRaven",
+      "BoneSlave",
+      "Roboster2",
+      "FishRider",
+      "CancerMan"
+    ]
+  },
+  "boom": {
+    "name": "BOOM",
+    "mp": 8,
+    "desc": "A succession of explosions strikes enemies [all}",
+    "reqs": {
+      "lv": 14,
+      "hp": 0,
+      "mp": 50,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 123
+    },
+    "upgrades": [
+      "Explodet"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "bounce": {
+    "name": "BOUNCE",
+    "mp": 4,
+    "desc": "Bounces back all enemy spells.",
+    "reqs": {
+      "lv": 20,
+      "hp": 0,
+      "mp": 84,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 141
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "bugblow": {
+    "name": "BUGBLOW",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the bug family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 68,
+      "mp": 0,
+      "atk": 72,
+      "def": 0,
+      "agl": 62,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Picky",
+      "StubBird",
+      "WalrusMan"
+    ]
+  },
+  "callhelp": {
+    "name": "CALLHELP",
+    "mp": 4,
+    "desc": "Summons friends who attack in droves.",
+    "reqs": {
+      "lv": 17,
+      "hp": 84,
+      "mp": 42,
+      "atk": 0,
+      "def": 0,
+      "agl": 68,
+      "int": 98
+    },
+    "upgrades": [
+      "YellHelp"
+    ],
+    "combined": [],
+    "monsters": [
+      "SpotSlime",
+      "Snaily",
+      "FangSlime",
+      "MiniDrak",
+      "Vampirus",
+      "ArrowDog",
+      "Snapper",
+      "Gophecada",
+      "Butterfly",
+      "ArmyAnt",
+      "GoHopper",
+      "ArmyCrab",
+      "Mummy",
+      "CaptDead",
+      "Goopi",
+      "HoodSquid",
+      "Pumpoise"
+    ]
+  },
+  "chance": {
+    "name": "CHANCE",
+    "mp": 20,
+    "desc": "There is no telling what may happen.",
+    "reqs": {
+      "lv": 40,
+      "hp": 0,
+      "mp": 224,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 420
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "GoldSlime",
+      "WonderEgg",
+      "Watabou",
+      "WhiteKing",
+      "Kagebou"
+    ]
+  },
+  "chargeup": {
+    "name": "CHARGEUP",
+    "mp": 0,
+    "desc": "Inflicts severe damage on the next turn.",
+    "reqs": {
+      "lv": 14,
+      "hp": 98,
+      "mp": 0,
+      "atk": 0,
+      "def": 84,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "PearlGel",
+      "FangSlime",
+      "Almiraj",
+      "Skullroo",
+      "Beavern",
+      "HammerMan",
+      "BullBird",
+      "Oniono",
+      "GoHopper",
+      "EvilWell",
+      "Gigantes",
+      "Golem",
+      "ProtoMech",
+      "Darck"
+    ]
+  },
+  "cleancut": {
+    "name": "CLEANCUT",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the material family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 68,
+      "mp": 0,
+      "atk": 72,
+      "def": 0,
+      "agl": 62,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "SpotKing",
+      "Swordgon",
+      "EvilSeed",
+      "DarkEye",
+      "GateGuard"
+    ]
+  },
+  "cover": {
+    "name": "COVER",
+    "mp": 2,
+    "desc": "Takes all attacks meant for another monster.",
+    "reqs": {
+      "lv": 5,
+      "hp": 35,
+      "mp": 0,
+      "atk": 0,
+      "def": 30,
+      "agl": 30,
+      "int": 0
+    },
+    "upgrades": [
+      "Guardian"
+    ],
+    "combined": [],
+    "monsters": [
+      "IronTurt",
+      "BossTroll",
+      "Grendal",
+      "LavaMan",
+      "StoneMan",
+      "AxeShark"
+    ]
+  },
+  "curse": {
+    "name": "CURSE",
+    "mp": 3,
+    "desc": "Lays a curse on all enemies.",
+    "reqs": {
+      "lv": 15,
+      "hp": 0,
+      "mp": 65,
+      "atk": 0,
+      "def": 0,
+      "agl": 82,
+      "int": 148
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "KingCobra",
+      "DuckKite",
+      "KiteHawk",
+      "FaceTree",
+      "HerbMan",
+      "Butterfly",
+      "Reaper"
+    ]
+  },
+  "curseoff": {
+    "name": "CURSEOFF",
+    "mp": 2,
+    "desc": "Lifts a curse [all}",
+    "reqs": {
+      "lv": 7,
+      "hp": 0,
+      "mp": 27,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 44
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "AquaHawk",
+      "FloraMan",
+      "TreeBoy",
+      "DeadNite",
+      "WindMerge"
+    ]
+  },
+  "danceshut": {
+    "name": "DANCESHUT",
+    "mp": 6,
+    "desc": "Prevents all enemies from dancing.",
+    "reqs": {
+      "lv": 16,
+      "hp": 100,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 120,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "HerbMan"
+    ]
+  },
+  "dechaos": {
+    "name": "DECHAOS",
+    "mp": 2,
+    "desc": "Clears confusion in all party monsters.",
+    "reqs": {
+      "lv": 6,
+      "hp": 0,
+      "mp": 24,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 47
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "FireWeed",
+      "DeadNite",
+      "EvilWand",
+      "CoilBird"
+    ]
+  },
+  "defeat": {
+    "name": "DEFEAT",
+    "mp": 7,
+    "desc": "Instantly slays enemies [all}",
+    "reqs": {
+      "lv": 24,
+      "hp": 0,
+      "mp": 80,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 177
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "defense": {
+    "name": "DEFENSE",
+    "mp": 4,
+    "desc": "Lowers DEF of all enemy monsters.",
+    "reqs": {
+      "lv": 8,
+      "hp": 0,
+      "mp": 36,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 58
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "demagic": {
+    "name": "DEMAGIC",
+    "mp": 7,
+    "desc": "Lifts the effects of all spells on enemies [all}",
+    "reqs": {
+      "lv": 20,
+      "hp": 0,
+      "mp": 100,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 252
+    },
+    "upgrades": [],
+    "combined": [
+      "Surge",
+      "UltraDown"
+    ],
+    "monsters": [
+      "Warubou",
+      "Zoma",
+      "PsychoPiz",
+      "Mirudraas2",
+      "DeathMore3",
+      "Orgodemir2"
+    ]
+  },
+  "devilcut": {
+    "name": "DEVILCUT",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the devil family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 64,
+      "mp": 0,
+      "atk": 58,
+      "def": 0,
+      "agl": 62,
+      "int": 87
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Rayburn",
+      "Serpentia",
+      "HornBeet",
+      "Sickler",
+      "Reaper",
+      "SabreMan"
+    ]
+  },
+  "diagocall": {
+    "name": "DIAGOCALL",
+    "mp": 20,
+    "desc": "Summons Diago to battle.",
+    "reqs": {
+      "lv": 25,
+      "hp": 0,
+      "mp": 100,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 250
+    },
+    "upgrades": [
+      "SamsiCall",
+      "BazooCall"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "dodge": {
+    "name": "DODGE",
+    "mp": 4,
+    "desc": "Deflects any physical attack to another monster.",
+    "reqs": {
+      "lv": 18,
+      "hp": 126,
+      "mp": 0,
+      "atk": 108,
+      "def": 108,
+      "agl": 108,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "DragonKid",
+      "BigRoost",
+      "GiantSlug",
+      "Skulpent",
+      "Goopi",
+      "FishRider",
+      "Poseidon",
+      "Pumpoise"
+    ]
+  },
+  "drakslash": {
+    "name": "DRAKSLASH",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the dragon family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 62,
+      "mp": 0,
+      "atk": 72,
+      "def": 0,
+      "agl": 62,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "ManEater",
+      "Grendal",
+      "Durran",
+      "Clawster",
+      "Octoraid"
+    ]
+  },
+  "eagleeye": {
+    "name": "EAGLEEYE",
+    "mp": 0,
+    "desc": "Determines the presence of items nearby.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 40,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 62
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Skullroo",
+      "Mommonja",
+      "MadRaven",
+      "CragDevil",
+      "Mimic"
+    ]
+  },
+  "eerielite": {
+    "name": "EERIELITE",
+    "mp": 2,
+    "desc": "Weakens all enemies to magic spells.",
+    "reqs": {
+      "lv": 14,
+      "hp": 0,
+      "mp": 65,
+      "atk": 0,
+      "def": 0,
+      "agl": 84,
+      "int": 152
+    },
+    "upgrades": [],
+    "combined": [
+      "Curse",
+      "Radiant"
+    ],
+    "monsters": [
+      "Babble",
+      "Gorago",
+      "MistyWing",
+      "GhosTree",
+      "Hork",
+      "Reaper",
+      "DarkMate"
+    ]
+  },
+  "errand": {
+    "name": "ERRAND",
+    "mp": 2,
+    "desc": "Makes the monster run an errand for 100G.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 40,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 62
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "SnakeBat",
+      "Unicorn",
+      "WildApe",
+      "Emyu"
+    ]
+  },
+  "evilslash": {
+    "name": "EVILSLASH",
+    "mp": 3,
+    "desc": "A powerful but wildly aimed sword attack.",
+    "reqs": {
+      "lv": 15,
+      "hp": 106,
+      "mp": 0,
+      "atk": 90,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "LizardMan",
+      "MadDragon",
+      "Coatol",
+      "BattleRex",
+      "HammerMan",
+      "Armorpion",
+      "Gigantes",
+      "Mummy",
+      "RogueNite",
+      "WalrusMan",
+      "Orgodemir"
+    ]
+  },
+  "explodet": {
+    "name": "EXPLODET",
+    "mp": 15,
+    "desc": "Huge explosions blast enemies [all}",
+    "reqs": {
+      "lv": 29,
+      "hp": 0,
+      "mp": 120,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 285
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "fireair": {
+    "name": "FIREAIR",
+    "mp": 2,
+    "desc": "Inflicts damage with a breath of fire [all}",
+    "reqs": {
+      "lv": 3,
+      "hp": 21,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [
+      "BlazeAir",
+      "Scorching",
+      "WhiteFire"
+    ],
+    "combined": [],
+    "monsters": [
+      "DrakSlime",
+      "DragonKid",
+      "Dragon",
+      "LizardFly",
+      "Orochi",
+      "BattleRex",
+      "SkyDragon",
+      "GigaDraco",
+      "Phoenix",
+      "Shantak",
+      "StagBug",
+      "Demonite",
+      "MetalDrak",
+      "Gismo",
+      "LavaMan",
+      "Digong",
+      "DracoLord2",
+      "Sidoh",
+      "AsuraZoma",
+      "Pizzaro",
+      "Mirudraas2",
+      "Mudou",
+      "DeathMore2",
+      "Darkdrium",
+      "Dimensaur"
+    ]
+  },
+  "firebal": {
+    "name": "FIREBAL",
+    "mp": 4,
+    "desc": "Attacks enemies with a blast of fire [all}",
+    "reqs": {
+      "lv": 3,
+      "hp": 0,
+      "mp": 11,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 42
+    },
+    "upgrades": [
+      "Firebane",
+      "FireBolt"
+    ],
+    "combined": [],
+    "monsters": [
+      "Slime",
+      "Metabble",
+      "Pteranod",
+      "LizardFly",
+      "Goategon",
+      "KingLeo",
+      "MadCondor",
+      "FloraMan",
+      "Eyeder",
+      "Belzebub",
+      "AgDevil",
+      "EvilBeast",
+      "1EyeClown",
+      "Gremlin",
+      "FoxFire",
+      "JewelBag",
+      "RayGigas",
+      "Anemon",
+      "Gamanian",
+      "DracoLord",
+      "Hargon",
+      "Darck"
+    ]
+  },
+  "firebane": {
+    "name": "FIREBANE",
+    "mp": 6,
+    "desc": "Attacks enemies with a wall of fire [all}",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 34,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 94
+    },
+    "upgrades": [
+      "FireBolt"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "firebolt": {
+    "name": "FIREBOLT",
+    "mp": 10,
+    "desc": "A huge wall of fire incinerates enemies [all}",
+    "reqs": {
+      "lv": 26,
+      "hp": 0,
+      "mp": 96,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 220
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "fireslash": {
+    "name": "FIRESLASH",
+    "mp": 3,
+    "desc": "A fiery sword attack.",
+    "reqs": {
+      "lv": 11,
+      "hp": 77,
+      "mp": 34,
+      "atk": 66,
+      "def": 0,
+      "agl": 0,
+      "int": 98
+    },
+    "upgrades": [],
+    "combined": [
+      "Blazemore",
+      "ChargeUp"
+    ],
+    "monsters": [
+      "Dragon",
+      "Orochi",
+      "SkulRider",
+      "Grendal",
+      "Centasaur",
+      "EvilArmor"
+    ]
+  },
+  "focus": {
+    "name": "FOCUS",
+    "mp": 0,
+    "desc": "Enables two moves in the next turn.",
+    "reqs": {
+      "lv": 18,
+      "hp": 126,
+      "mp": 0,
+      "atk": 0,
+      "def": 108,
+      "agl": 108,
+      "int": 195
+    },
+    "upgrades": [],
+    "combined": [
+      "ChargeUp",
+      "SuckAir",
+      "Meditate"
+    ],
+    "monsters": [
+      "GranSlime",
+      "HerbMan",
+      "Akubar",
+      "Servant",
+      "Poseidon",
+      "LordDraco",
+      "AsuraZoma",
+      "DeathMore3",
+      "Orgodemir"
+    ]
+  },
+  "frigidair": {
+    "name": "FRIGIDAIR",
+    "mp": 2,
+    "desc": "Inflicts damage with a breath of ice [all}",
+    "reqs": {
+      "lv": 3,
+      "hp": 21,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [
+      "IceAir",
+      "IceStorm",
+      "WhiteAir",
+      "IceStorm"
+    ],
+    "combined": [],
+    "monsters": [
+      "GreatDrak",
+      "Divinegon",
+      "KingLeo",
+      "BigEye",
+      "Wyvern",
+      "Blizzardy",
+      "Demonite",
+      "EvilBeast",
+      "Akubar",
+      "Skullgon",
+      "Shadow",
+      "EvilWand",
+      "Gismo",
+      "IceMan",
+      "SeaHorse",
+      "Sidoh",
+      "Zoma",
+      "PsychoPiz",
+      "Mudou",
+      "Darkdrium"
+    ]
+  },
+  "geyser": {
+    "name": "GEYSER",
+    "mp": 2,
+    "desc": "Opens a geyser to send an enemy flying.",
+    "reqs": {
+      "lv": 22,
+      "hp": 140,
+      "mp": 120,
+      "atk": 120,
+      "def": 0,
+      "agl": 120,
+      "int": 288
+    },
+    "upgrades": [],
+    "combined": [
+      "RockThrow",
+      "HighJump"
+    ],
+    "monsters": [
+      "Beavern",
+      "Aquarella",
+      "Octoreach",
+      "SeaHorse",
+      "WhaleMage"
+    ]
+  },
+  "gigaslash": {
+    "name": "GIGASLASH",
+    "mp": 20,
+    "desc": "The ultimate sword attack.",
+    "reqs": {
+      "lv": 33,
+      "hp": 231,
+      "mp": 164,
+      "atk": 198,
+      "def": 0,
+      "agl": 198,
+      "int": 608
+    },
+    "upgrades": [],
+    "combined": [
+      "FireSlash",
+      "VacuSlash",
+      "BoltSlash",
+      "IceSlash"
+    ],
+    "monsters": [
+      "LizardMan",
+      "BeastNite",
+      "FooHero",
+      "WarMantis",
+      "MadKnight",
+      "Roboster2",
+      "Octoraid",
+      "AsuraZoma",
+      "Esterk"
+    ]
+  },
+  "guardian": {
+    "name": "GUARDIAN",
+    "mp": 4,
+    "desc": "Takes all attacks meant for party monsters.",
+    "reqs": {
+      "lv": 12,
+      "hp": 84,
+      "mp": 0,
+      "atk": 0,
+      "def": 72,
+      "agl": 72,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "heal": {
+    "name": "HEAL",
+    "mp": 2,
+    "desc": "Restores HP by 30 - 40.",
+    "reqs": {
+      "lv": 1,
+      "hp": 0,
+      "mp": 7,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 11
+    },
+    "upgrades": [
+      "HealMore",
+      "HealAll"
+    ],
+    "combined": [],
+    "monsters": [
+      "SlimeNite",
+      "Healer",
+      "Unicorn",
+      "Wyvern",
+      "MadGoose",
+      "FooHero",
+      "Eyeder",
+      "Gremlin",
+      "LampGenie",
+      "DeadNite",
+      "RogueNite",
+      "Octokid"
+    ]
+  },
+  "healall": {
+    "name": "HEALALL",
+    "mp": 7,
+    "desc": "Fully restores HP.",
+    "reqs": {
+      "lv": 16,
+      "hp": 0,
+      "mp": 82,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 144
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "healmore": {
+    "name": "HEALMORE",
+    "mp": 5,
+    "desc": "Restores HP by 75 - 90.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 52,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 87
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "healus": {
+    "name": "HEALUS",
+    "mp": 18,
+    "desc": "Restores HP by 90 - 120 [all}",
+    "reqs": {
+      "lv": 20,
+      "hp": 0,
+      "mp": 140,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 216
+    },
+    "upgrades": [
+      "HealUsAll"
+    ],
+    "combined": [],
+    "monsters": [
+      "Healer",
+      "MadCondor",
+      "Shantak",
+      "Lionex",
+      "DeadNoble",
+      "Lamia"
+    ]
+  },
+  "healusall": {
+    "name": "HEALUSALL",
+    "mp": 36,
+    "desc": "Fully restores HP [all}",
+    "reqs": {
+      "lv": 28,
+      "hp": 0,
+      "mp": 196,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 288
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "hellblast": {
+    "name": "HELLBLAST",
+    "mp": 25,
+    "desc": "Strikes all enemies with huge lightning.",
+    "reqs": {
+      "lv": 34,
+      "hp": 184,
+      "mp": 184,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 538
+    },
+    "upgrades": [],
+    "combined": [
+      "Thordain",
+      "Lightning"
+    ],
+    "monsters": [
+      "MetalKing",
+      "ZapBird",
+      "Azurile",
+      "DarkMate",
+      "LordDraco",
+      "Sidoh",
+      "Baramos",
+      "Pizzaro",
+      "DeathMore1",
+      "Dimensaur"
+    ]
+  },
+  "highjump": {
+    "name": "HIGHJUMP",
+    "mp": 5,
+    "desc": "The user leaps and attacks in the next turn.",
+    "reqs": {
+      "lv": 20,
+      "hp": 75,
+      "mp": 0,
+      "atk": 70,
+      "def": 0,
+      "agl": 48,
+      "int": 80
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "RockSlime",
+      "WingSnake",
+      "MadRaven",
+      "CactiBall",
+      "Gulpple",
+      "SpikyBoy",
+      "Grakos"
+    ]
+  },
+  "hustle": {
+    "name": "HUSTLE",
+    "mp": 12,
+    "desc": "A dance that restores HP by 70 - 80 [all}",
+    "reqs": {
+      "lv": 18,
+      "hp": 114,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 130,
+      "int": 173
+    },
+    "upgrades": [],
+    "combined": [
+      "HealAll",
+      "SideStep"
+    ],
+    "monsters": [
+      "SuperTen",
+      "Emyu",
+      "FunkyBird",
+      "TreeBoy",
+      "MudDoll",
+      "Octogon"
+    ]
+  },
+  "iceair": {
+    "name": "ICEAIR",
+    "mp": 4,
+    "desc": "Inflicts damage with a freezing breath [all}",
+    "reqs": {
+      "lv": 10,
+      "hp": 70,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [
+      "IceStorm",
+      "WhiteAir",
+      "IceStorm"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "icebolt": {
+    "name": "ICEBOLT",
+    "mp": 3,
+    "desc": "Small chunks of ice hail down on enemies [all}",
+    "reqs": {
+      "lv": 5,
+      "hp": 0,
+      "mp": 16,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 54
+    },
+    "upgrades": [
+      "SnowStorm",
+      "Blizzard"
+    ],
+    "combined": [],
+    "monsters": [
+      "Snaily",
+      "Metaly",
+      "WindBeast",
+      "Beavern",
+      "Yeti",
+      "BigEye",
+      "1EyeClown",
+      "GoatHorn",
+      "Servant",
+      "IceMan",
+      "MerTiger"
+    ]
+  },
+  "iceslash": {
+    "name": "ICESLASH",
+    "mp": 3,
+    "desc": "A sword attack made stronger by the power of ice.",
+    "reqs": {
+      "lv": 11,
+      "hp": 77,
+      "mp": 34,
+      "atk": 66,
+      "def": 0,
+      "agl": 0,
+      "int": 76
+    },
+    "upgrades": [],
+    "combined": [
+      "SnowStorm",
+      "ChargeUp"
+    ],
+    "monsters": [
+      "GreatDrak",
+      "Yeti",
+      "Blizzardy",
+      "TailEater",
+      "Bubblemon",
+      "Skullgon"
+    ]
+  },
+  "icestorm": {
+    "name": "ICESTORM",
+    "mp": 8,
+    "desc": "Inflicts damage by exhaling a blizzard [all}",
+    "reqs": {
+      "lv": 20,
+      "hp": 140,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [
+      "WhiteAir",
+      "IceStorm"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "imitate": {
+    "name": "IMITATE",
+    "mp": 4,
+    "desc": "Imitates the enemy'S moves.",
+    "reqs": {
+      "lv": 21,
+      "hp": 147,
+      "mp": 147,
+      "atk": 126,
+      "def": 126,
+      "agl": 126,
+      "int": 227
+    },
+    "upgrades": [],
+    "combined": [
+      "Transform",
+      "Focus"
+    ],
+    "monsters": [
+      "SpotSlime",
+      "SuperTen",
+      "Watabou",
+      "Copycat"
+    ]
+  },
+  "increase": {
+    "name": "INCREASE",
+    "mp": 3,
+    "desc": "Raises DEF of party monsters [all}",
+    "reqs": {
+      "lv": 6,
+      "hp": 0,
+      "mp": 27,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 44
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "infermore": {
+    "name": "INFERMORE",
+    "mp": 4,
+    "desc": "Twisters tear through enemies [all}",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 38,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 101
+    },
+    "upgrades": [
+      "Infermost"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "infermost": {
+    "name": "INFERMOST",
+    "mp": 8,
+    "desc": "A huge tornado roars through enemies [all}",
+    "reqs": {
+      "lv": 21,
+      "hp": 0,
+      "mp": 104,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 242
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "infernos": {
+    "name": "INFERNOS",
+    "mp": 2,
+    "desc": "Razor sharp whirlwinds slash enemies [all}",
+    "reqs": {
+      "lv": 2,
+      "hp": 0,
+      "mp": 10,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 38
+    },
+    "upgrades": [
+      "Infermore",
+      "Infermost"
+    ],
+    "combined": [],
+    "monsters": [
+      "Andreal",
+      "Vampirus",
+      "WindBeast",
+      "MadPecker",
+      "LandOwl",
+      "Garudian",
+      "CragDevil",
+      "Sickler",
+      "Lionex",
+      "GoatHorn",
+      "WindMerge",
+      "WhiteKing",
+      "Facer",
+      "CloudKing"
+    ]
+  },
+  "informer": {
+    "name": "INFORMER",
+    "mp": 0,
+    "desc": "Use to obtain information on monsters.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 40,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 62
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "GranSlime",
+      "MadGopher",
+      "MistyWing",
+      "NiteWhip"
+    ]
+  },
+  "ironize": {
+    "name": "IRONIZE",
+    "mp": 2,
+    "desc": "Changes all party monsters into chunks of iron.",
+    "reqs": {
+      "lv": 15,
+      "hp": 0,
+      "mp": 62,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 87
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MetalKing",
+      "WonderEgg",
+      "Tortragon",
+      "WhipBird",
+      "EvilBeast",
+      "DarkCrab"
+    ]
+  },
+  "k.o.dance": {
+    "name": "K.O.DANCE",
+    "mp": 6,
+    "desc": "A dance that induces death in all enemies.",
+    "reqs": {
+      "lv": 20,
+      "hp": 140,
+      "mp": 72,
+      "atk": 0,
+      "def": 0,
+      "agl": 120,
+      "int": 216
+    },
+    "upgrades": [],
+    "combined": [
+      "Curse",
+      "LureDance"
+    ],
+    "monsters": [
+      "KingCobra",
+      "SuperTen",
+      "DanceVegi",
+      "Shadow",
+      "Lazamanus"
+    ]
+  },
+  "kamikaze": {
+    "name": "KAMIKAZE",
+    "mp": 1,
+    "desc": "Leaves the user and target on the verge of death.",
+    "reqs": {
+      "lv": 18,
+      "hp": 126,
+      "mp": 0,
+      "atk": 108,
+      "def": 108,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [
+      "ChargeUp",
+      "Ramming"
+    ],
+    "monsters": [
+      "Spikerous",
+      "HammerMan",
+      "ArmyAnt",
+      "RotRaven",
+      "RushFish"
+    ]
+  },
+  "legsweep": {
+    "name": "LEGSWEEP",
+    "mp": 1,
+    "desc": "Sweeps the leg out from under one enemy.",
+    "reqs": {
+      "lv": 6,
+      "hp": 32,
+      "mp": 0,
+      "atk": 31,
+      "def": 0,
+      "agl": 48,
+      "int": 0
+    },
+    "upgrades": [
+      "BigTrip"
+    ],
+    "combined": [],
+    "monsters": [
+      "Slabbit",
+      "Grizzly",
+      "MadCat",
+      "StagBug",
+      "SkulRider",
+      "Goopi"
+    ]
+  },
+  "lifesong": {
+    "name": "LIFESONG",
+    "mp": 20,
+    "desc": "Revives all dead friends in the next turn.",
+    "reqs": {
+      "lv": 27,
+      "hp": 198,
+      "mp": 94,
+      "atk": 0,
+      "def": 0,
+      "agl": 145,
+      "int": 292
+    },
+    "upgrades": [],
+    "combined": [
+      "Revive",
+      "WarCry"
+    ],
+    "monsters": [
+      "HaloSlime",
+      "Florajay",
+      "Azurile",
+      "Facer",
+      "Orgodemir2"
+    ]
+  },
+  "lightning": {
+    "name": "LIGHTNING",
+    "mp": 3,
+    "desc": "Summons a lightning storm [all}",
+    "reqs": {
+      "lv": 10,
+      "hp": 65,
+      "mp": 0,
+      "atk": 90,
+      "def": 0,
+      "agl": 52,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "SlimeBorg",
+      "Tortragon",
+      "ZapBird",
+      "Skularach",
+      "RotRaven",
+      "NiteWhip"
+    ]
+  },
+  "loverain": {
+    "name": "LOVERAIN",
+    "mp": 28,
+    "desc": "Summons rain that restores HP.",
+    "reqs": {
+      "lv": 24,
+      "hp": 116,
+      "mp": 96,
+      "atk": 0,
+      "def": 0,
+      "agl": 78,
+      "int": 263
+    },
+    "upgrades": [],
+    "combined": [
+      "Meditate",
+      "LifeSong"
+    ],
+    "monsters": [
+      "MimeSlime",
+      "BigEye",
+      "Brushead"
+    ]
+  },
+  "luredance": {
+    "name": "LUREDANCE",
+    "mp": 2,
+    "desc": "A dance that makes all enemies want to join in.",
+    "reqs": {
+      "lv": 14,
+      "hp": 84,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 98,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MadDragon",
+      "Mommonja",
+      "MadGoose",
+      "DanceVegi",
+      "GhosTree",
+      "Eggplaton",
+      "Puppetor",
+      "Octokid",
+      "HoodSquid"
+    ]
+  },
+  "lushlicks": {
+    "name": "LUSHLICKS",
+    "mp": 2,
+    "desc": "Licks one enemy to stop it for one turn.",
+    "reqs": {
+      "lv": 7,
+      "hp": 55,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 67,
+      "int": 0
+    },
+    "upgrades": [
+      "SickLick"
+    ],
+    "combined": [],
+    "monsters": [
+      "SpotSlime",
+      "TropicGel",
+      "FairyDrak",
+      "Poisongon",
+      "SnakeBat",
+      "Tonguella",
+      "Antbear",
+      "Slurperon",
+      "GiantSlug",
+      "Lipsy",
+      "Hork",
+      "Gamanian"
+    ]
+  },
+  "magicback": {
+    "name": "MAGICBACK",
+    "mp": 4,
+    "desc": "Bounces back a spell once.",
+    "reqs": {
+      "lv": 16,
+      "hp": 0,
+      "mp": 68,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 112
+    },
+    "upgrades": [
+      "Bounce"
+    ],
+    "combined": [],
+    "monsters": [
+      "Tortragon",
+      "Gophecada",
+      "EyeBall",
+      "PutrePup",
+      "MadMirror"
+    ]
+  },
+  "magicwall": {
+    "name": "MAGICWALL",
+    "mp": 3,
+    "desc": "Raises protection against magic spells [all}",
+    "reqs": {
+      "lv": 19,
+      "hp": 0,
+      "mp": 80,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 134
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "IronTurt",
+      "KiteHawk",
+      "AmberWeed",
+      "WeedBug",
+      "DarkCrab",
+      "Scallopa"
+    ]
+  },
+  "mapmagic": {
+    "name": "MAPMAGIC",
+    "mp": 2,
+    "desc": "Checks the surrounding area'S terrain.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 40,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 62
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "BeanMan",
+      "Eyeder",
+      "EvilWand"
+    ]
+  },
+  "massacre": {
+    "name": "MASSACRE",
+    "mp": 3,
+    "desc": "Inflicts severe damage on one friend or foe.",
+    "reqs": {
+      "lv": 12,
+      "hp": 84,
+      "mp": 0,
+      "atk": 72,
+      "def": 0,
+      "agl": 72,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MadDragon",
+      "GigaDraco",
+      "GulpBeast",
+      "Gorago",
+      "Ogre",
+      "BossTroll",
+      "MadKnight",
+      "MetalDrak",
+      "EvilPot",
+      "WalrusMan",
+      "DracoLord2"
+    ]
+  },
+  "meditate": {
+    "name": "MEDITATE",
+    "mp": 8,
+    "desc": "Meditates to restore HP by 500.",
+    "reqs": {
+      "lv": 26,
+      "hp": 182,
+      "mp": 0,
+      "atk": 0,
+      "def": 156,
+      "agl": 0,
+      "int": 281
+    },
+    "upgrades": [],
+    "combined": [
+      "StrongD",
+      "Guardian"
+    ],
+    "monsters": [
+      "Divinegon",
+      "Azurile",
+      "Golem",
+      "DracoLord"
+    ]
+  },
+  "metalcut": {
+    "name": "METALCUT",
+    "mp": 3,
+    "desc": "Inflicts damage on a high DEF enemy.",
+    "reqs": {
+      "lv": 12,
+      "hp": 68,
+      "mp": 0,
+      "atk": 72,
+      "def": 0,
+      "agl": 62,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "BattleRex",
+      "Antbear",
+      "Dumbira",
+      "ArmyCrab",
+      "Ogre",
+      "RogueNite",
+      "Roboster2",
+      "Clawster"
+    ]
+  },
+  "mouthshut": {
+    "name": "MOUTHSHUT",
+    "mp": 6,
+    "desc": "Prevents all enemies from using breath attacks.",
+    "reqs": {
+      "lv": 17,
+      "hp": 120,
+      "mp": 0,
+      "atk": 100,
+      "def": 0,
+      "agl": 140,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "SpotKing",
+      "Mommonja",
+      "ArrowDog",
+      "Toadstool",
+      "Pyuro",
+      "Spooky",
+      "RayGigas"
+    ]
+  },
+  "mpass": {
+    "name": "MPASS",
+    "mp": 20,
+    "desc": "Gives 15MP to a party monster.",
+    "reqs": {
+      "lv": 1,
+      "hp": 0,
+      "mp": 55,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 11
+    },
+    "upgrades": [
+      "MPassmore",
+      "MPassmost"
+    ],
+    "combined": [],
+    "monsters": [
+      "KingSlime",
+      "TropicGel",
+      "TreeBoy",
+      "Warubou",
+      "Eggplaton",
+      "Mudron",
+      "Octokid",
+      "Octogon",
+      "Lamia"
+    ]
+  },
+  "mpassmore": {
+    "name": "MPASSMORE",
+    "mp": 40,
+    "desc": "Gives 30MP to a party monster.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 120,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 87
+    },
+    "upgrades": [
+      "MPassmost"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "mpassmost": {
+    "name": "MPASSMOST",
+    "mp": 100,
+    "desc": "Gives 80MP to a party monster.",
+    "reqs": {
+      "lv": 16,
+      "hp": 0,
+      "mp": 82,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 144
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "multicut": {
+    "name": "MULTICUT",
+    "mp": 20,
+    "desc": "A crosscutting sword attack [all}",
+    "reqs": {
+      "lv": 28,
+      "hp": 154,
+      "mp": 140,
+      "atk": 168,
+      "def": 0,
+      "agl": 168,
+      "int": 572
+    },
+    "upgrades": [],
+    "combined": [
+      "Vacuum",
+      "ZombieCut"
+    ],
+    "monsters": [
+      "SkyDragon",
+      "MadCondor",
+      "Balzak",
+      "Genosidoh"
+    ]
+  },
+  "napattack": {
+    "name": "NAPATTACK",
+    "mp": 2,
+    "desc": "A physical attack that may put the target to sleep.",
+    "reqs": {
+      "lv": 7,
+      "hp": 49,
+      "mp": 0,
+      "atk": 42,
+      "def": 0,
+      "agl": 0,
+      "int": 76
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "SpotKing",
+      "Tonguella",
+      "Gulpple",
+      "Toadstool",
+      "ArmyAnt",
+      "Gamanian"
+    ]
+  },
+  "numboff": {
+    "name": "NUMBOFF",
+    "mp": 2,
+    "desc": "Cures paralysis and sleep [all}",
+    "reqs": {
+      "lv": 8,
+      "hp": 0,
+      "mp": 30,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 47
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Snaily",
+      "MadPlant",
+      "CoilBird"
+    ]
+  },
+  "odddance": {
+    "name": "ODDDANCE",
+    "mp": 0,
+    "desc": "A dance that reduces an enemy'S MP.",
+    "reqs": {
+      "lv": 10,
+      "hp": 54,
+      "mp": 27,
+      "atk": 0,
+      "def": 0,
+      "agl": 63,
+      "int": 89
+    },
+    "upgrades": [
+      "RobDance"
+    ],
+    "combined": [],
+    "monsters": [
+      "CatFly",
+      "CactiBall",
+      "Slurperon",
+      "FaceTree",
+      "Eggplaton",
+      "GiantWorm",
+      "Copycat",
+      "Puppetor",
+      "Brushead",
+      "MudDoll",
+      "Octoreach",
+      "Starfish"
+    ]
+  },
+  "outside": {
+    "name": "OUTSIDE",
+    "mp": 2,
+    "desc": "Instantly warps the party out from caves and towers.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 40,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 62
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "EyeBall",
+      "Spooky",
+      "FoxFire",
+      "MadMirror",
+      "EvilPot"
+    ]
+  },
+  "palsyair": {
+    "name": "PALSYAIR",
+    "mp": 4,
+    "desc": "A breath that paralyzes all enemies.",
+    "reqs": {
+      "lv": 16,
+      "hp": 112,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 173
+    },
+    "upgrades": [],
+    "combined": [
+      "SleepAir",
+      "PoisonAir"
+    ],
+    "monsters": [
+      "Chamelgon",
+      "Saccer",
+      "FireWeed",
+      "MultiEyes",
+      "DarkEye"
+    ]
+  },
+  "panicall": {
+    "name": "PANICALL",
+    "mp": 5,
+    "desc": "Confuses all enemies.",
+    "reqs": {
+      "lv": 12,
+      "hp": 0,
+      "mp": 56,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 89
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MimeSlime",
+      "Chamelgon",
+      "DuckKite",
+      "CragDevil",
+      "JewelBag",
+      "Voodoll",
+      "PutreFish"
+    ]
+  },
+  "panidance": {
+    "name": "PANIDANCE",
+    "mp": 4,
+    "desc": "A dance that confuses all enemies.",
+    "reqs": {
+      "lv": 13,
+      "hp": 74,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 78,
+      "int": 141
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Skullroo",
+      "FunkyBird",
+      "Exaucers",
+      "Octoreach"
+    ]
+  },
+  "paralyze": {
+    "name": "PARALYZE",
+    "mp": 3,
+    "desc": "A physical attack that may paralyze the target.",
+    "reqs": {
+      "lv": 9,
+      "hp": 63,
+      "mp": 0,
+      "atk": 54,
+      "def": 0,
+      "agl": 0,
+      "int": 98
+    },
+    "upgrades": [],
+    "combined": [
+      "PoisonHit",
+      "NapAttack"
+    ],
+    "monsters": [
+      "TreeSlime",
+      "Chamelgon",
+      "CactiBall",
+      "EvilSeed",
+      "GiantMoth",
+      "MadHornet",
+      "Mummy",
+      "SabreMan",
+      "Anemon"
+    ]
+  },
+  "pheromone": {
+    "name": "PHEROMONE",
+    "mp": 0,
+    "desc": "Attracts enemy monsters of the opposite gender.",
+    "reqs": {
+      "lv": 4,
+      "hp": 0,
+      "mp": 28,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 44
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Warubou",
+      "Lipsy",
+      "Puppetor"
+    ]
+  },
+  "poisonair": {
+    "name": "POISONAIR",
+    "mp": 4,
+    "desc": "A breath that badly poisons all enemies.",
+    "reqs": {
+      "lv": 14,
+      "hp": 98,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 152
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "poisongas": {
+    "name": "POISONGAS",
+    "mp": 3,
+    "desc": "A breath that poisons all enemies.",
+    "reqs": {
+      "lv": 9,
+      "hp": 63,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 98
+    },
+    "upgrades": [
+      "PoisonAir"
+    ],
+    "combined": [],
+    "monsters": [
+      "Poisongon",
+      "Andreal",
+      "WingSnake",
+      "Devipine",
+      "TailEater",
+      "Skularach",
+      "Hork",
+      "Inverzon",
+      "Moray",
+      "Anemon",
+      "RogueWave",
+      "Digong",
+      "Mudou"
+    ]
+  },
+  "poisonhit": {
+    "name": "POISONHIT",
+    "mp": 2,
+    "desc": "A physical attack that may poison the target.",
+    "reqs": {
+      "lv": 5,
+      "hp": 35,
+      "mp": 0,
+      "atk": 50,
+      "def": 0,
+      "agl": 0,
+      "int": 90
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Babble",
+      "Poisongon",
+      "Rayburn",
+      "KingCobra",
+      "Crestpent",
+      "Catapila",
+      "MadHornet",
+      "Skulpent",
+      "Starfish"
+    ]
+  },
+  "psycheup": {
+    "name": "PSYCHEUP",
+    "mp": 3,
+    "desc": "Inflicts severe damage at the end of the turn.",
+    "reqs": {
+      "lv": 12,
+      "hp": 74,
+      "mp": 0,
+      "atk": 82,
+      "def": 68,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Saccer",
+      "DarkHorn",
+      "ManEater",
+      "Ogre",
+      "MadCandle",
+      "Golem",
+      "Moray",
+      "KingSquid"
+    ]
+  },
+  "quadhits": {
+    "name": "QUADHITS",
+    "mp": 6,
+    "desc": "A physical attack that strikes four times.",
+    "reqs": {
+      "lv": 24,
+      "hp": 124,
+      "mp": 0,
+      "atk": 112,
+      "def": 0,
+      "agl": 136,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "radiant": {
+    "name": "RADIANT",
+    "mp": 2,
+    "desc": "A blast of light blinds all the enemies.",
+    "reqs": {
+      "lv": 12,
+      "hp": 0,
+      "mp": 42,
+      "atk": 0,
+      "def": 0,
+      "agl": 72,
+      "int": 130
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "PearlGel",
+      "Slime",
+      "EvilSeed",
+      "TailEater",
+      "GiantMoth",
+      "DarkEye",
+      "Spooky",
+      "MadSpirit",
+      "Scallopa"
+    ]
+  },
+  "rainslash": {
+    "name": "RAINSLASH",
+    "mp": 5,
+    "desc": "A sword attack that hits all enemies.",
+    "reqs": {
+      "lv": 15,
+      "hp": 92,
+      "mp": 0,
+      "atk": 90,
+      "def": 0,
+      "agl": 96,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [
+      "SquallHit",
+      "BiAttack"
+    ],
+    "monsters": [
+      "SlimeBorg",
+      "Swordgon",
+      "Serpentia",
+      "BeastNite",
+      "Dumbira",
+      "StubBird",
+      "Snapper",
+      "Armorpion",
+      "SkulRider",
+      "Centasaur",
+      "Roboster",
+      "FishRider",
+      "CancerMan",
+      "AxeShark",
+      "KingSquid",
+      "Esterk"
+    ]
+  },
+  "ramming": {
+    "name": "RAMMING",
+    "mp": 1,
+    "desc": "A fullbody tackle that also hurts the user.",
+    "reqs": {
+      "lv": 12,
+      "hp": 70,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 70,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "BoxSlime",
+      "RockSlime",
+      "Drygon",
+      "MiniDrak",
+      "PillowRat",
+      "GulpBeast",
+      "BullBird",
+      "Belzebub",
+      "BossTroll",
+      "ProtoMech",
+      "Petiteel",
+      "PutreFish",
+      "Digong",
+      "DeathMore2"
+    ]
+  },
+  "revive": {
+    "name": "REVIVE",
+    "mp": 20,
+    "desc": "Revives a dead monster.",
+    "reqs": {
+      "lv": 27,
+      "hp": 0,
+      "mp": 174,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 274
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "robdance": {
+    "name": "ROBDANCE",
+    "mp": 0,
+    "desc": "A dance that steals an enemy'S MP.",
+    "reqs": {
+      "lv": 12,
+      "hp": 68,
+      "mp": 39,
+      "atk": 0,
+      "def": 0,
+      "agl": 85,
+      "int": 110
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "robmagic": {
+    "name": "ROBMAGIC",
+    "mp": 0,
+    "desc": "Steals MP from an enemy.",
+    "reqs": {
+      "lv": 7,
+      "hp": 0,
+      "mp": 32,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 51
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Dracky",
+      "Oniono",
+      "BeanMan",
+      "GhosTree",
+      "WeedBug",
+      "GoHopper",
+      "SabreMan",
+      "Aquadon"
+    ]
+  },
+  "rockthrow": {
+    "name": "ROCKTHROW",
+    "mp": 5,
+    "desc": "Hurls giant boulders at enemies [all}",
+    "reqs": {
+      "lv": 16,
+      "hp": 124,
+      "mp": 0,
+      "atk": 102,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "SnakeBat",
+      "Spikerous",
+      "GigaDraco",
+      "HornBeet",
+      "BombCrag",
+      "Baramos"
+    ]
+  },
+  "sacrifice": {
+    "name": "SACRIFICE",
+    "mp": 1,
+    "desc": "The user explodes to inflict damage on all enemies.",
+    "reqs": {
+      "lv": 28,
+      "hp": 0,
+      "mp": 40,
+      "atk": 0,
+      "def": 140,
+      "agl": 0,
+      "int": 78
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Metabble",
+      "WonderEgg",
+      "Gasgon",
+      "AgDevil",
+      "Facer",
+      "SpikyBoy",
+      "BombCrag"
+    ]
+  },
+  "samsicall": {
+    "name": "SAMSICALL",
+    "mp": 20,
+    "desc": "Summons Samsi to battle.",
+    "reqs": {
+      "lv": 30,
+      "hp": 0,
+      "mp": 130,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 400
+    },
+    "upgrades": [
+      "BazooCall"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "sandstorm": {
+    "name": "SANDSTORM",
+    "mp": 2,
+    "desc": "Obscures the visibility of all enemies.",
+    "reqs": {
+      "lv": 10,
+      "hp": 70,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 70,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MiniDrak",
+      "Trumpeter",
+      "BigRoost",
+      "MetalDrak",
+      "Brushead",
+      "RushFish",
+      "Grakos"
+    ]
+  },
+  "sap": {
+    "name": "SAP",
+    "mp": 3,
+    "desc": "Lowers DEF of one enemy.",
+    "reqs": {
+      "lv": 4,
+      "hp": 0,
+      "mp": 18,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 27
+    },
+    "upgrades": [
+      "Defense"
+    ],
+    "combined": [],
+    "monsters": [
+      "TreeSlime",
+      "Drygon",
+      "LizardFly",
+      "Picky",
+      "MadPecker",
+      "MadPlant",
+      "MultiEyes",
+      "MedusaEye",
+      "Orc",
+      "PutrePup",
+      "Skeletor",
+      "Voodoll",
+      "Merman",
+      "AxeShark"
+    ]
+  },
+  "scorching": {
+    "name": "SCORCHING",
+    "mp": 8,
+    "desc": "Inflicts damage with a huge blast of fire [all}",
+    "reqs": {
+      "lv": 20,
+      "hp": 140,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [
+      "WhiteFire"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "sealpray": {
+    "name": "SEALPRAY",
+    "mp": 15,
+    "desc": "Seals a skill used by the enemy.",
+    "reqs": {
+      "lv": 35,
+      "hp": 87,
+      "mp": 160,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 794
+    },
+    "upgrades": [],
+    "combined": [
+      "StopSpell",
+      "DanceShut",
+      "MouthShut"
+    ],
+    "monsters": [
+      "HaloSlime",
+      "Pixy"
+    ]
+  },
+  "shears": {
+    "name": "SHEARS",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the plant family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 68,
+      "mp": 0,
+      "atk": 62,
+      "def": 0,
+      "agl": 72,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "BullBird",
+      "Droll",
+      "WarMantis",
+      "MedusaEye"
+    ]
+  },
+  "sicklick": {
+    "name": "SICKLICK",
+    "mp": 4,
+    "desc": "Licks one enemy to reduce its DEF.",
+    "reqs": {
+      "lv": 13,
+      "hp": 81,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 94,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "sidestep": {
+    "name": "SIDESTEP",
+    "mp": 1,
+    "desc": "A quickfooted skill for dodging attacks.",
+    "reqs": {
+      "lv": 9,
+      "hp": 63,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 54,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Slabbit",
+      "PillowRat",
+      "WildApe",
+      "LandOwl",
+      "DanceVegi",
+      "Inverzon",
+      "MudDoll"
+    ]
+  },
+  "sleep": {
+    "name": "SLEEP",
+    "mp": 3,
+    "desc": "Makes a single enemy sleep.",
+    "reqs": {
+      "lv": 4,
+      "hp": 0,
+      "mp": 24,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 29
+    },
+    "upgrades": [
+      "SleepAll"
+    ],
+    "combined": [],
+    "monsters": [
+      "HaloSlime",
+      "Almiraj",
+      "BeastNite",
+      "DarkHorn",
+      "Wyvern",
+      "DuckKite",
+      "Dracky",
+      "Slurperon",
+      "Stubsuck",
+      "StagBug",
+      "LampGenie",
+      "Moray",
+      "MerTiger"
+    ]
+  },
+  "sleepair": {
+    "name": "SLEEPAIR",
+    "mp": 3,
+    "desc": "A breath that induces sleep in all enemies.",
+    "reqs": {
+      "lv": 10,
+      "hp": 70,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 108
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "TreeSlime",
+      "TropicGel",
+      "DragonKid",
+      "FairyDrak",
+      "Tonguella",
+      "NoctoKing",
+      "Goategon",
+      "Gulpple",
+      "Toadstool",
+      "Oniono",
+      "Devipine",
+      "ManEater",
+      "Egdracil",
+      "AgDevil",
+      "MadSpirit",
+      "Merman",
+      "Angleron"
+    ]
+  },
+  "sleepall": {
+    "name": "SLEEPALL",
+    "mp": 5,
+    "desc": "Makes all enemies sleep.",
+    "reqs": {
+      "lv": 11,
+      "hp": 0,
+      "mp": 52,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 83
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "slimeblow": {
+    "name": "SLIMEBLOW",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the slime family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 62,
+      "mp": 0,
+      "atk": 68,
+      "def": 0,
+      "agl": 72,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Serpentia",
+      "FairyRat",
+      "Gigantes",
+      "SpikyBoy",
+      "ProtoMech"
+    ]
+  },
+  "slow": {
+    "name": "SLOW",
+    "mp": 3,
+    "desc": "Lowers AGL of one enemy.",
+    "reqs": {
+      "lv": 3,
+      "hp": 0,
+      "mp": 16,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 26
+    },
+    "upgrades": [
+      "SlowAll"
+    ],
+    "combined": [],
+    "monsters": [
+      "CatFly",
+      "PillowRat",
+      "FairyRat",
+      "Goategon",
+      "MadPlant",
+      "Droll",
+      "PutrePup"
+    ]
+  },
+  "slowall": {
+    "name": "SLOWALL",
+    "mp": 4,
+    "desc": "Lowers AGL of all enemy monsters.",
+    "reqs": {
+      "lv": 7,
+      "hp": 0,
+      "mp": 32,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 51
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "snowstorm": {
+    "name": "SNOWSTORM",
+    "mp": 5,
+    "desc": "Enemies are flash frozen [all}",
+    "reqs": {
+      "lv": 12,
+      "hp": 0,
+      "mp": 42,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 108
+    },
+    "upgrades": [
+      "Blizzard"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "speed": {
+    "name": "SPEED",
+    "mp": 2,
+    "desc": "Raises AGL of one monster.",
+    "reqs": {
+      "lv": 1,
+      "hp": 0,
+      "mp": 10,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 15
+    },
+    "upgrades": [
+      "SpeedUp"
+    ],
+    "combined": [],
+    "monsters": [
+      "Florajay",
+      "Pyuro",
+      "CurseLamp",
+      "Petiteel"
+    ]
+  },
+  "speedup": {
+    "name": "SPEEDUP",
+    "mp": 3,
+    "desc": "Raises AGL of party monsters [all}",
+    "reqs": {
+      "lv": 5,
+      "hp": 0,
+      "mp": 24,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 36
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "squallhit": {
+    "name": "SQUALLHIT",
+    "mp": 2,
+    "desc": "A physical attack that hits first.",
+    "reqs": {
+      "lv": 12,
+      "hp": 72,
+      "mp": 0,
+      "atk": 68,
+      "def": 0,
+      "agl": 82,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [
+      "SpeedUp",
+      "ChargeUp"
+    ],
+    "monsters": [
+      "WingSlime",
+      "WingSnake",
+      "Antbear",
+      "Grizzly",
+      "MadCat",
+      "AquaHawk",
+      "Phoenix",
+      "Sickler",
+      "ChopClown",
+      "CaptDead",
+      "Roboster",
+      "Aquarella",
+      "Octoraid"
+    ]
+  },
+  "stepguard": {
+    "name": "STEPGUARD",
+    "mp": 2,
+    "desc": "Protects the party from injurious terrain.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 40,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 62
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "WingTree",
+      "Stubsuck",
+      "GiantWorm",
+      "Droll",
+      "DarkCrab"
+    ]
+  },
+  "stopspell": {
+    "name": "STOPSPELL",
+    "mp": 3,
+    "desc": "Prevents spell casting by all enemies.",
+    "reqs": {
+      "lv": 9,
+      "hp": 0,
+      "mp": 44,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 69
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Crestpent",
+      "CatFly",
+      "DarkHorn",
+      "FaceTree",
+      "Snapper",
+      "Gremlin",
+      "Centasaur",
+      "JewelBag"
+    ]
+  },
+  "stormwind": {
+    "name": "STORMWIND",
+    "mp": 10,
+    "desc": "Bounces back all breath attacks to all enemies.",
+    "reqs": {
+      "lv": 19,
+      "hp": 140,
+      "mp": 0,
+      "atk": 0,
+      "def": 126,
+      "agl": 140,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "strongd": {
+    "name": "STRONGD",
+    "mp": 3,
+    "desc": "Strongly protects the user against all attacks.",
+    "reqs": {
+      "lv": 14,
+      "hp": 98,
+      "mp": 0,
+      "atk": 0,
+      "def": 84,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "RockSlime",
+      "Orligon",
+      "IronTurt",
+      "RainHawk",
+      "Digster",
+      "IceMan",
+      "StoneMan"
+    ]
+  },
+  "suckair": {
+    "name": "SUCKAIR",
+    "mp": 0,
+    "desc": "Holds in a breath to inflict severe damage next turn",
+    "reqs": {
+      "lv": 17,
+      "hp": 119,
+      "mp": 0,
+      "atk": 0,
+      "def": 102,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "DrakSlime",
+      "SkyDragon",
+      "Gismo",
+      "Pumpoise",
+      "Mirudraas2"
+    ]
+  },
+  "suckall": {
+    "name": "SUCKALL",
+    "mp": 2,
+    "desc": "Inhales all breath attacks meant for the party.",
+    "reqs": {
+      "lv": 13,
+      "hp": 91,
+      "mp": 0,
+      "atk": 0,
+      "def": 78,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Dragon",
+      "GreatDrak",
+      "Shantak",
+      "Egdracil",
+      "Digster",
+      "CoilBird",
+      "StoneMan"
+    ]
+  },
+  "surge": {
+    "name": "SURGE",
+    "mp": 7,
+    "desc": "Eliminates all status problems among friends.",
+    "reqs": {
+      "lv": 23,
+      "hp": 0,
+      "mp": 130,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 306
+    },
+    "upgrades": [],
+    "combined": [
+      "Antidote",
+      "DeChaos",
+      "NumbOff",
+      "CurseOff"
+    ],
+    "monsters": [
+      "GoldSlime",
+      "RainHawk",
+      "GoldGolem",
+      "CloudKing",
+      "DracoLord2"
+    ]
+  },
+  "surround": {
+    "name": "SURROUND",
+    "mp": 3,
+    "desc": "Surrounds all enemies in a mirage.",
+    "reqs": {
+      "lv": 10,
+      "hp": 0,
+      "mp": 47,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 74
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Babble",
+      "FairyDrak",
+      "Andreal",
+      "NoctoKing",
+      "FairyRat",
+      "CatMage",
+      "Picky",
+      "Butterfly",
+      "MedusaEye",
+      "Inverzon",
+      "Voodoll",
+      "Angleron"
+    ]
+  },
+  "tailwind": {
+    "name": "TAILWIND",
+    "mp": 6,
+    "desc": "Bounces back a breath attack to an enemy.",
+    "reqs": {
+      "lv": 11,
+      "hp": 75,
+      "mp": 0,
+      "atk": 0,
+      "def": 84,
+      "agl": 70,
+      "int": 0
+    },
+    "upgrades": [
+      "StormWind"
+    ],
+    "combined": [],
+    "monsters": [
+      "WingSlime",
+      "Pteranod",
+      "MadRaven",
+      "KiteHawk",
+      "Phoenix",
+      "MadHornet",
+      "Jamirus",
+      "LampGenie"
+    ]
+  },
+  "takemagic": {
+    "name": "TAKEMAGIC",
+    "mp": 2,
+    "desc": "Absorbs the MP of a spell cast against the user.",
+    "reqs": {
+      "lv": 13,
+      "hp": 0,
+      "mp": 58,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 94
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Lazamanus",
+      "Exaucers"
+    ]
+  },
+  "tatsucall": {
+    "name": "TATSUCALL",
+    "mp": 20,
+    "desc": "Summons Tatsu to battle.",
+    "reqs": {
+      "lv": 20,
+      "hp": 0,
+      "mp": 70,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 100
+    },
+    "upgrades": [
+      "DiagoCall",
+      "SamsiCall",
+      "BazooCall"
+    ],
+    "combined": [],
+    "monsters": [
+      "WhipBird",
+      "DeadNoble",
+      "GoldGolem",
+      "Hargon",
+      "DeathMore1",
+      "Kagebou"
+    ]
+  },
+  "thordain": {
+    "name": "THORDAIN",
+    "mp": 15,
+    "desc": "Huge shards of lightning rip enemies [all}",
+    "reqs": {
+      "lv": 30,
+      "hp": 0,
+      "mp": 128,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 306
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "tidalwave": {
+    "name": "TIDALWAVE",
+    "mp": 15,
+    "desc": "Summons a towering wall of water [all}",
+    "reqs": {
+      "lv": 19,
+      "hp": 112,
+      "mp": 0,
+      "atk": 114,
+      "def": 0,
+      "agl": 132,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "transform": {
+    "name": "TRANSFORM",
+    "mp": 5,
+    "desc": "Transforms the user into a chosen enemy.",
+    "reqs": {
+      "lv": 21,
+      "hp": 0,
+      "mp": 92,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 159
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "CatMage",
+      "Copycat",
+      "MadMirror"
+    ]
+  },
+  "twinhits": {
+    "name": "TWINHITS",
+    "mp": 6,
+    "desc": "Doubles the ATK of one monster.",
+    "reqs": {
+      "lv": 17,
+      "hp": 0,
+      "mp": 72,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 119
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Orligon",
+      "StubBird",
+      "AmberWeed",
+      "BeanMan",
+      "ArmorPede",
+      "MultiEyes",
+      "Pixy",
+      "ChopClown",
+      "CurseLamp",
+      "Petiteel",
+      "Grakos"
+    ]
+  },
+  "twinslash": {
+    "name": "TWINSLASH",
+    "mp": 2,
+    "desc": "Inflicts severe damage but also hurts the user.",
+    "reqs": {
+      "lv": 8,
+      "hp": 80,
+      "mp": 0,
+      "atk": 80,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "WildApe",
+      "Dumbira",
+      "ArmorPede",
+      "Skullgon"
+    ]
+  },
+  "ultradown": {
+    "name": "ULTRADOWN",
+    "mp": 7,
+    "desc": "Greatly weakens an enemy.",
+    "reqs": {
+      "lv": 21,
+      "hp": 0,
+      "mp": 110,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 270
+    },
+    "upgrades": [],
+    "combined": [
+      "Defense",
+      "SlowAll",
+      "Surround"
+    ],
+    "monsters": [
+      "Rosevine",
+      "Titanis",
+      "DeathMore2"
+    ]
+  },
+  "upper": {
+    "name": "UPPER",
+    "mp": 2,
+    "desc": "Raises DEF of one monster.",
+    "reqs": {
+      "lv": 2,
+      "hp": 0,
+      "mp": 14,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 22
+    },
+    "upgrades": [
+      "Increase"
+    ],
+    "combined": [],
+    "monsters": [
+      "SlimeNite",
+      "BoxSlime",
+      "PearlGel",
+      "Healer",
+      "Saccer",
+      "Catapila",
+      "ArmorPede",
+      "ArmyCrab",
+      "CurseLamp",
+      "RushFish",
+      "Scallopa",
+      "Starfish"
+    ]
+  },
+  "vacuslash": {
+    "name": "VACUSLASH",
+    "mp": 3,
+    "desc": "A sword attack enhanced by whirlwinds.",
+    "reqs": {
+      "lv": 11,
+      "hp": 77,
+      "mp": 34,
+      "atk": 66,
+      "def": 0,
+      "agl": 0,
+      "int": 76
+    },
+    "upgrades": [],
+    "combined": [
+      "WindBeast",
+      "ChargeUp"
+    ],
+    "monsters": [
+      "Rayburn",
+      "WindBeast",
+      "MadCat",
+      "MadPecker",
+      "BigRoost",
+      "WarMantis",
+      "ArcDemon",
+      "Lionex",
+      "ChopClown"
+    ]
+  },
+  "vacuum": {
+    "name": "VACUUM",
+    "mp": 6,
+    "desc": "Creates a tornado with vicious winds [all}",
+    "reqs": {
+      "lv": 19,
+      "hp": 112,
+      "mp": 0,
+      "atk": 114,
+      "def": 0,
+      "agl": 132,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "vivify": {
+    "name": "VIVIFY",
+    "mp": 10,
+    "desc": "May revive a dead monster.",
+    "reqs": {
+      "lv": 14,
+      "hp": 0,
+      "mp": 63,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 98
+    },
+    "upgrades": [
+      "Revive"
+    ],
+    "combined": [],
+    "monsters": [
+      "KingSlime",
+      "Unicorn",
+      "Egdracil",
+      "Orc",
+      "Mudron",
+      "Merman",
+      "KingSquid",
+      "Lamia"
+    ]
+  },
+  "warcry": {
+    "name": "WARCRY",
+    "mp": 3,
+    "desc": "A terrifying cry that stops all enemies.",
+    "reqs": {
+      "lv": 14,
+      "hp": 120,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "FangSlime",
+      "Drygon",
+      "GulpBeast",
+      "Yeti",
+      "Trumpeter",
+      "EyeBall",
+      "EvilWell",
+      "MerTiger"
+    ]
+  },
+  "watershot": {
+    "name": "WATERSHOT",
+    "mp": 5,
+    "desc": "Shoots a high volume of water at an enemy.",
+    "reqs": {
+      "lv": 13,
+      "hp": 74,
+      "mp": 0,
+      "atk": 60,
+      "def": 0,
+      "agl": 84,
+      "int": 0
+    },
+    "upgrades": [
+      "Tidalwave"
+    ],
+    "combined": [],
+    "monsters": [
+      "Bubblemon",
+      "PutreFish",
+      "RogueWave",
+      "WhaleMage"
+    ]
+  },
+  "whistle": {
+    "name": "WHISTLE",
+    "mp": 0,
+    "desc": "Attracts enemy monsters.",
+    "reqs": {
+      "lv": 4,
+      "hp": 0,
+      "mp": 28,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 44
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "Slabbit",
+      "Watabou",
+      "GiantSlug",
+      "MadCandle"
+    ]
+  },
+  "whiteair": {
+    "name": "WHITEAIR",
+    "mp": 16,
+    "desc": "Looses a white shining breath of ice [all}",
+    "reqs": {
+      "lv": 20,
+      "hp": 210,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "whitefire": {
+    "name": "WHITEFIRE",
+    "mp": 16,
+    "desc": "Inflicts damage with incredible fire [all}",
+    "reqs": {
+      "lv": 20,
+      "hp": 210,
+      "mp": 0,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 0
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "windbeast": {
+    "name": "WINDBEAST",
+    "mp": 3,
+    "desc": "Slashes a single monster with sharp whirlwinds.",
+    "reqs": {
+      "lv": 13,
+      "hp": 74,
+      "mp": 0,
+      "atk": 60,
+      "def": 0,
+      "agl": 84,
+      "int": 0
+    },
+    "upgrades": [
+      "Vacuum"
+    ],
+    "combined": [],
+    "monsters": [
+      "WingSlime",
+      "Pteranod",
+      "MadGoose",
+      "Emyu",
+      "Garudian",
+      "Pyuro",
+      "GiantMoth",
+      "Durran",
+      "NiteWhip",
+      "Exaucers",
+      "Aquadon",
+      "Genosidoh"
+    ]
+  },
+  "yellhelp": {
+    "name": "YELLHELP",
+    "mp": 8,
+    "desc": "Summons a mass of friends that attack in droves.",
+    "reqs": {
+      "lv": 23,
+      "hp": 128,
+      "mp": 64,
+      "atk": 0,
+      "def": 0,
+      "agl": 82,
+      "int": 134
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": []
+  },
+  "zap": {
+    "name": "ZAP",
+    "mp": 10,
+    "desc": "Powerful bolts of lightning lash enemies [all}",
+    "reqs": {
+      "lv": 15,
+      "hp": 0,
+      "mp": 54,
+      "atk": 0,
+      "def": 0,
+      "agl": 0,
+      "int": 130
+    },
+    "upgrades": [
+      "Thordain"
+    ],
+    "combined": [],
+    "monsters": []
+  },
+  "zombiecut": {
+    "name": "ZOMBIECUT",
+    "mp": 3,
+    "desc": "Inflicts severe damage on the zombie family.",
+    "reqs": {
+      "lv": 12,
+      "hp": 64,
+      "mp": 0,
+      "atk": 58,
+      "def": 0,
+      "agl": 62,
+      "int": 87
+    },
+    "upgrades": [],
+    "combined": [],
+    "monsters": [
+      "MadGopher",
+      "WingTree",
+      "Stubsuck",
+      "Armorpion"
+    ]
+  }
+};
+
+
 // ══════════════════════════════════════════════════════════════
 //  BREEDING ENGINE
 // ══════════════════════════════════════════════════════════════
@@ -2292,7 +6375,7 @@ function runBreedCheck() {
           </div>
           <div class="monster-skills" style="margin-top:8px;">
             <div style="font-size:0.65rem;color:var(--text-dim);margin-bottom:3px;">NATURAL SKILLS</div>
-            ${sk.map(s=>`<span class="skill-pill">${s}</span>`).join('')}
+            ${sk.map(s=>`<span class="skill-pill" style="cursor:pointer;" onclick="openSkillModal('${s}')">${s}</span>`).join('')}
           </div>
         </div>
       </div>
@@ -2378,7 +6461,7 @@ function runRecipeFinder() {
             <span class="family-badge ${FAMILY_COLORS[f]||'f-unknown'}">${f}</span>
             <span style="font-size:0.65rem;color:var(--text-dim);padding-top:2px;">Max Lv. ${mML(t)}</span>
           </div>
-          <div style="margin-top:6px;">${sk.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>
+          <div style="margin-top:6px;">${sk.map(s=>`<span class="skill-pill" style="cursor:pointer;" onclick="openSkillModal('${s}')">${s}</span>`).join('')}</div>
         </div>
       </div>
       <hr class="divider">
@@ -2561,6 +6644,129 @@ function renderDirectory() {
 //  MONSTER MODAL
 // ══════════════════════════════════════════════════════════════
 
+
+function openSkillModal(skillName) {
+  const key = skillName.toLowerCase();
+  const s = SKILLS_DB[key];
+  if (!s) {
+    alert("ข้อมูลสกิล " + skillName + " ยังไม่รองรับในขณะนี้");
+    return;
+  }
+
+  const reqs = s.reqs;
+  const reqsHTML = reqs && Object.keys(reqs).length ? `
+    <div style="margin-bottom:12px;">
+      <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:6px;">SKILL REQUIREMENTS</div>
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:4px;text-align:center;background:var(--bg0);padding:6px;border-radius:6px;font-size:0.7rem;border:1px solid var(--border);">
+        <div><div style="color:var(--text-dim)">LV</div><strong style="color:var(--gold)">${reqs.lv}</strong></div>
+        <div><div style="color:var(--text-dim)">HP</div><strong style="color:var(--gold)">${reqs.hp}</strong></div>
+        <div><div style="color:var(--text-dim)">MP</div><strong style="color:var(--gold)">${reqs.mp}</strong></div>
+        <div><div style="color:var(--text-dim)">ATK</div><strong style="color:var(--gold)">${reqs.atk}</strong></div>
+        <div><div style="color:var(--text-dim)">DEF</div><strong style="color:var(--gold)">${reqs.def}</strong></div>
+        <div><div style="color:var(--text-dim)">AGL</div><strong style="color:var(--gold)">${reqs.agl}</strong></div>
+        <div><div style="color:var(--text-dim)">INT</div><strong style="color:var(--gold)">${reqs.int}</strong></div>
+      </div>
+    </div>
+  ` : '';
+
+  let upgradesHTML = '';
+  if (s.upgrades && s.upgrades.length) {
+    upgradesHTML = `
+      <div style="margin-bottom:12px;">
+        <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:4px;">UPGRADE / EVOLUTION PATH</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${s.upgrades.map(u => `<span class="skill-pill" style="cursor:pointer;background:var(--bg2);border-color:var(--gold);" onclick="openSkillModal('${u}')">➡️ ${u}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  let combinedHTML = '';
+  if (s.combined && s.combined.length) {
+    combinedHTML = `
+      <div style="margin-bottom:12px;">
+        <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:4px;">OBTAINED BY COMBINING</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${s.combined.map(c => `<span class="skill-pill" style="cursor:pointer;background:var(--bg2);border-color:var(--border);" onclick="openSkillModal('${c}')">🧪 ${c}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  let usedInHTML = '';
+  const usedInUpgrades = [];
+  const usedInCombinations = [];
+  
+  for (const [k, sk] of Object.entries(SKILLS_DB)) {
+    if (sk.upgrades.some(u => u.toLowerCase() === key)) {
+      usedInUpgrades.push(sk.name);
+    }
+    if (sk.combined.some(c => c.toLowerCase() === key)) {
+      usedInCombinations.push(sk.name);
+    }
+  }
+
+  if (usedInUpgrades.length || usedInCombinations.length) {
+    usedInHTML = `
+      <div style="margin-bottom:12px;">
+        <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:4px;">USED TO INHERIT / EVOLVE</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${usedInUpgrades.map(u => `<span class="skill-pill" style="cursor:pointer;background:var(--bg2);" onclick="openSkillModal('${u}')">⬅️ Evolved from ${u}</span>`).join('')}
+          ${usedInCombinations.map(c => `<span class="skill-pill" style="cursor:pointer;background:var(--bg2);border-color:var(--gold-dim);" onclick="openSkillModal('${c}')">🔬 Combines into ${c}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  let monstersHTML = '';
+  if (s.monsters && s.monsters.length) {
+    monstersHTML = `
+      <div style="margin-bottom:12px;">
+        <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:6px;">NATURAL SKILL OF LISTED MONSTERS</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;max-height:150px;overflow-y:auto;padding-right:4px;" class="recipe-scroll-list">
+          ${s.monsters.map(m => {
+            const f = mFamily(m);
+            return `
+              <div onclick="closeSkillModal(); openMonsterModal('${m}')" style="display:inline-flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:0.7rem;cursor:pointer;transition:border-color 0.1s;">
+                <span>${getMonsterImg(m, "w-5 h-5")}</span>
+                <strong>${m}</strong>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById('skill-modal-content').innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
+      <div style="flex:1">
+        <div style="font-family:'Cinzel',serif;font-size:1.25rem;color:var(--gold);">${s.name}</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px;">MP Cost: <strong style="color:var(--text)">${s.mp} MP</strong></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.8rem;line-height:1.4;">
+      ${s.desc}
+    </div>
+
+    ${reqsHTML}
+    ${upgradesHTML}
+    ${combinedHTML}
+    ${usedInHTML}
+    ${monstersHTML}
+  `;
+
+  document.getElementById('skill-modal-overlay').classList.add('open');
+  document.getElementById('skill-modal-overlay').style.display = 'flex';
+}
+
+function closeSkillModal(e) {
+  if (e && e.target !== document.getElementById('skill-modal-overlay')) return;
+  document.getElementById('skill-modal-overlay').classList.remove('open');
+  document.getElementById('skill-modal-overlay').style.display = 'none';
+}
+
 function openMonsterModal(name) {
   if (!M[name]) return;
   const f = mFamily(name);
@@ -2597,7 +6803,7 @@ function openMonsterModal(name) {
 
     <div style="margin-bottom:12px;">
       <div style="font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:6px;">NATURAL SKILLS</div>
-      <div>${sk.map(s=>`<span class="skill-pill" style="font-size:0.72rem;padding:3px 8px;">${s}</span>`).join('')}</div>
+      <div>${sk.map(s=>`<span class="skill-pill" style="font-size:0.72rem;padding:3px 8px;cursor:pointer;" onclick="openSkillModal('${s}')">${s}</span>`).join('')}</div>
     </div>
 
     <div style="margin-bottom:12px;">
@@ -3697,7 +7903,7 @@ function renderWalkthrough() {
                   <div><div style="color:var(--text-dim)">AGL</div><strong style="color:#f59e0b">${b.agl}</strong></div>
                   <div><div style="color:var(--text-dim)">INT</div><strong style="color:#6366f1">${b.int}</strong></div>
                 </div>
-                <div style="font-size:0.65rem;color:var(--text-dim);margin-bottom:3px;">สกิล (SKILLS): ${b.skills.map(s => `<span class="skill-pill" style="font-size:0.58rem;padding:0px 4px;">${s}</span>`).join(' ')}</div>
+                <div style="font-size:0.65rem;color:var(--text-dim);margin-bottom:3px;">สกิล (SKILLS): ${b.skills.map(s => `<span class="skill-pill" style="font-size:0.58rem;padding:0px 4px;cursor:pointer;" onclick="openSkillModal('${s}')">${s}</span>`).join(' ')}</div>
                 <div style="font-size:0.68rem;color:var(--text);line-height:1.4;margin-top:4px;"><b>กลยุทธ์ (Strategy):</b> ${b.strategy}</div>
               </div>
             `).join('')}

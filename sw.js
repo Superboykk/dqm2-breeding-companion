@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dqm2-companion-v3';
+const CACHE_NAME = 'dqm2-companion-v4';
 const ASSETS = [
   './',
   './index.html',
