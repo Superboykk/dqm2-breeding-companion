@@ -2034,6 +2034,14 @@ const mLoc    = n => M[n]?.[11] ?? 'Unknown';
 const mStats  = n => M[n] ? {hp:M[n][2],mp:M[n][3],atk:M[n][4],def:M[n][5],agl:M[n][6],int:M[n][7]} : null;
 const allNames = () => Object.keys(M).sort();
 
+const getMonsterImg = (name, sizeClass = "w-6 h-6") => {
+  if (!name || !M[name]) return '';
+  const filename = name.toLowerCase().replace(/[^a-z0-9]/g, "") + ".webp";
+  const f = mFamily(name);
+  const emoji = FAMILY_EMOJI[f] || '❓';
+  return `<img src="monster image/${filename}" class="${sizeClass} inline-block object-contain" style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;" onerror="this.outerHTML='<span class=\\'inline-block text-center\\'>${emoji}</span>'" alt="${name}">`;
+};
+
 // ══════════════════════════════════════════════════════════════
 //  BREEDING ENGINE
 // ══════════════════════════════════════════════════════════════
@@ -2179,7 +2187,7 @@ function setupAC(inputId, dropId, key, onSelect) {
     drop.innerHTML = matches.map(n => {
       const f = mFamily(n);
       return `<div class="ac-item" data-name="${n}" onclick="selectMonster('${inputId}','${dropId}','${key}','${n}')">
-        <span>${FAMILY_EMOJI[f]||'❓'}</span>
+        ${getMonsterImg(n, "w-6 h-6")}
         <span style="flex:1">${n}</span>
         <span class="family-badge ${FAMILY_COLORS[f]||'f-unknown'}" style="font-size:0.58rem;">${f}</span>
       </div>`;
@@ -2206,7 +2214,7 @@ function renderMonsterPreview(key, name) {
   el.style.display = 'block';
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:6px;margin-top:4px;">
-      <span style="font-size:1.6rem;">${FAMILY_EMOJI[f]||'❓'}</span>
+      ${getMonsterImg(name, "w-10 h-10")}
       <div style="flex:1">
         <div style="font-weight:600;font-size:0.85rem;">${name}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
@@ -2241,7 +2249,7 @@ function runBreedCheck() {
       <div class="card card-highlight">
         <div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;margin-bottom:8px;">RESULT</div>
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:2rem;">${FAMILY_EMOJI[mFamily(b)]||'❓'}</span>
+          ${getMonsterImg(b, "w-12 h-12")}
           <div>
             <div class="monster-name">Stronger ${b}</div>
             <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;">Same family × same family → a stronger version of your Base Monster.</div>
@@ -2273,7 +2281,7 @@ function runBreedCheck() {
       <div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;margin-bottom:10px;">🥚 OFFSPRING</div>
       <div class="result-monster">
         <div>
-          <div style="font-size:2.5rem;">${FAMILY_EMOJI[f]||'❓'}</div>
+          ${getMonsterImg(rn, "w-16 h-16")}
         </div>
         <div style="flex:1">
           <div class="monster-name">${rn}</div>
@@ -2362,7 +2370,7 @@ function runRecipeFinder() {
   let html = `
     <div class="card card-highlight" style="margin-bottom:12px;">
       <div style="display:flex;align-items:center;gap:12px;">
-        <span style="font-size:2rem;">${FAMILY_EMOJI[f]||'❓'}</span>
+        ${getMonsterImg(t, "w-12 h-12")}
         <div>
           <div class="monster-name">${t}</div>
           <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
@@ -2423,12 +2431,12 @@ function renderRecipeCard(r, target, idx) {
       ${num}
       <div class="recipe-parents">
         <div class="recipe-parent" onclick="openMonsterModal('${r.base}')">
-          ${FAMILY_EMOJI[bf]} <strong>${r.base}</strong>
+          ${getMonsterImg(r.base, "w-6 h-6")} <strong>${r.base}</strong>
           <span class="family-badge ${FAMILY_COLORS[bf]||'f-unknown'}" style="margin-left:4px;">${bf}</span>
         </div>
         <span class="recipe-plus">✕</span>
         <div class="recipe-parent" onclick="openMonsterModal('${r.mate}')">
-          ${FAMILY_EMOJI[mf]} <strong>${r.mate}</strong>
+          ${getMonsterImg(r.mate, "w-6 h-6")} <strong>${r.mate}</strong>
           <span class="family-badge ${FAMILY_COLORS[mf]||'f-unknown'}" style="margin-left:4px;">${mf}</span>
         </div>
         <span class="recipe-arrow">→ ${target}</span>
@@ -2443,7 +2451,7 @@ function renderRecipeCard(r, target, idx) {
       ${num}
       <div class="recipe-parents">
         <div class="recipe-parent" onclick="openMonsterModal('${r.base}')">
-          ${FAMILY_EMOJI[bf]} <strong>${r.base}</strong>
+          ${getMonsterImg(r.base, "w-6 h-6")} <strong>${r.base}</strong>
           <span class="family-badge ${FAMILY_COLORS[bf]||'f-unknown'}" style="margin-left:4px;">${bf}</span>
         </div>
         <span class="recipe-plus">✕</span>
@@ -2465,7 +2473,7 @@ function renderRecipeCard(r, target, idx) {
         </div>
         <span class="recipe-plus">✕</span>
         <div class="recipe-parent" onclick="openMonsterModal('${r.mate}')">
-          ${FAMILY_EMOJI[mf]} <strong>${r.mate}</strong>
+          ${getMonsterImg(r.mate, "w-6 h-6")} <strong>${r.mate}</strong>
           <span class="family-badge ${FAMILY_COLORS[mf]||'f-unknown'}" style="margin-left:4px;">${mf}</span>
         </div>
         <span class="recipe-arrow">→ ${target}</span>
@@ -2533,7 +2541,7 @@ function renderDirectory() {
     const f = mFamily(n);
     const sk = mSkills(n);
     return `<div class="monster-list-item" onclick="openMonsterModal('${n}')">
-      <span class="monster-list-icon">${FAMILY_EMOJI[f]||'❓'}</span>
+      <span class="monster-list-icon">${getMonsterImg(n, "w-8 h-8")}</span>
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
           <span class="monster-list-name">${n}</span>
@@ -2577,7 +2585,7 @@ function openMonsterModal(name) {
   document.getElementById('modal-content').innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
       <div style="text-align:center">
-        <div style="font-size:3rem;line-height:1;">${FAMILY_EMOJI[f]||'❓'}</div>
+        <div>${getMonsterImg(name, "w-16 h-16")}</div>
         <div style="margin-top:4px;"><span class="family-badge ${FAMILY_COLORS[f]||'f-unknown'}">${f}</span></div>
       </div>
       <div style="flex:1">
@@ -2807,7 +2815,7 @@ function renderInventory() {
     return `<div class="card" style="margin-bottom: 12px; padding: 12px 14px; display: flex; flex-direction: column; align-items: stretch; border-left: 3px solid var(--border);">
       <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:1.4rem; cursor:pointer;" onclick="openMonsterModal('${item.name}')">${FAMILY_EMOJI[f]||'❓'}</span>
+          <span style="cursor:pointer;" onclick="openMonsterModal('${item.name}')">${getMonsterImg(item.name, "w-8 h-8")}</span>
           <div>
             <span style="font-weight:600;font-size:0.88rem; cursor:pointer;" onclick="openMonsterModal('${item.name}')">${item.name}</span>
             <span class="family-badge ${genderBadge}" style="margin-left:4px;font-size:0.58rem;padding:1px 5px;">${genderSymbol} ${item.gender}</span>
@@ -2930,7 +2938,7 @@ function toggleAllRecipes(id, monsterName) {
               <span style="color: var(--text-dim); font-size:0.65rem;">ผสม ${mateDisplay}${condDisplay}</span>
               <span style="color: var(--text-dim); margin: 0 3px;">➔</span>
               <span class="tree-node-card" style="padding: 2px 6px; font-size: 0.68rem; margin: 0; background: var(--bg0); border-color: var(--border);" onclick="openMonsterModal('${r.result}')">
-                <span>${FAMILY_EMOJI[resF] || '❓'}</span>
+                <span>${getMonsterImg(r.result, "w-5 h-5")}</span>
                 <strong>${r.result}</strong>
               </span>
             </div>
@@ -3035,7 +3043,7 @@ function renderPossibleCombos() {
     return `<div class="card" style="margin-bottom:8px;border-left: 3px solid var(--gold);">
       <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="${isKnown ? `openMonsterModal('${pureName}')` : ''}">
         <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:1.8rem;">${FAMILY_EMOJI[f]||'❓'}</span>
+          <span>${getMonsterImg(pureName, "w-10 h-10")}</span>
           <div>
             <div style="font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:0.95rem;">${name}</div>
             <div style="display:flex;gap:4px;margin-top:2px;">
@@ -3214,7 +3222,7 @@ function collectLeafMaterials(node, materials = {}) {
 
 function renderTreeNodeHTML(node, isLast = true) {
   const f = node.isFamily ? node.name.replace("Any ", "") : mFamily(node.name);
-  const emoji = FAMILY_EMOJI[f] || '❓';
+  const emoji = node.isFamily ? (FAMILY_EMOJI[f] || '❓') : getMonsterImg(node.name, "w-6 h-6");
   
   let badgeHTML = '';
   let toggleButtonHTML = '';
@@ -3319,7 +3327,7 @@ function renderBreedingTreeUI() {
   
   materialList.forEach(m => {
     const f = m.isFamily ? m.name.replace("Any ", "") : mFamily(m.name);
-    const emoji = FAMILY_EMOJI[f] || '❓';
+    const emoji = m.isFamily ? (FAMILY_EMOJI[f] || '❓') : getMonsterImg(m.name, "w-6 h-6");
     const typeLabel = m.isFamily ? 'Family Base' : (m.isWild ? 'Wild Catch' : 'Base Monster');
     const typeColor = m.isFamily ? 'background:#5b21b6;color:#ddd;' : (m.isWild ? 'background:#047857;color:#a7f3d0;' : 'background:#374151;color:#d1d5db;');
     
@@ -3701,7 +3709,7 @@ function renderWalkthrough() {
       const f = mFamily(m);
       return `
         <div onclick="openMonsterModal('${m}')" style="display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:0.7rem;cursor:pointer;transition:border-color 0.1s;">
-          <span>${FAMILY_EMOJI[f]||'❓'}</span>
+          <span>${getMonsterImg(m, "w-6 h-6")}</span>
           <strong>${m}</strong>
         </div>
       `;
