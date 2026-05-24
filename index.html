@@ -2039,7 +2039,7 @@ const getMonsterImg = (name, sizeClass = "w-6 h-6") => {
   const filename = name.toLowerCase().replace(/[^a-z0-9]/g, "") + ".webp";
   const f = mFamily(name);
   const emoji = FAMILY_EMOJI[f] || '❓';
-  return `<img src="monster image/${filename}" class="${sizeClass} inline-block object-contain" style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;" onerror="this.outerHTML='<span class=\\'inline-block text-center\\'>${emoji}</span>'" alt="${name}">`;
+  return `<img src="monster%20image/${filename}" class="${sizeClass} inline-block object-contain" style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;" onerror="this.outerHTML='<span class=\\'inline-block text-center\\'>${emoji}</span>'" alt="${name}">`;
 };
 
 // ══════════════════════════════════════════════════════════════
